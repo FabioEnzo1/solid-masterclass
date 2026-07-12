@@ -1,4 +1,4 @@
-import { buildApp } from "./app";
+import { buildApp } from "./drivers/app";
 
 const app = buildApp();
 

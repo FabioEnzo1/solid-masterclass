@@ -2,9 +2,9 @@ import { FastifyInstance } from "fastify";
 import request from "supertest";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
+import { db } from "../resources/db/client";
+import { userTable } from "../resources/db/schema";
 import { buildApp } from "./app";
-import { db } from "./db/client";
-import { userTable } from "./db/schema";
 
 let app: FastifyInstance;
 
