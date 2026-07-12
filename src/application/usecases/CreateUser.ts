@@ -64,11 +64,9 @@ export class CreateUser {
     if (!user) {
       throw new UserCreationError();
     }
-
     await SendNotificationFactory.create(
       input.preferredMarketingChannel,
     ).send();
-
     return {
       id: user.id,
       name: user.name,

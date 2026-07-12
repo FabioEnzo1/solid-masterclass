@@ -27,7 +27,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await app.close();
-});
+}, 30000);
 
 beforeEach(async () => {
   await db.delete(userTable);
