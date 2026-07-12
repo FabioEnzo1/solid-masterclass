@@ -1,7 +1,5 @@
 import fastifySwagger from "@fastify/swagger";
 import fastifySwaggerUI from "@fastify/swagger-ui";
-import bcrypt from "bcrypt";
-import { eq } from "drizzle-orm";
 import fastify from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import {
@@ -11,11 +9,16 @@ import {
 } from "fastify-type-provider-zod";
 import { z } from "zod/v4";
 
-import { db } from "../resources/db/client";
-import { userTable } from "../resources/db/schema";
-
+import {
+  EmailAlreadyRegisteredError,
+  InvalidMarketingChannelError,
+  PasswordsDoNotMatchError,
+} from "../application/errors";
+import { CreateUser } from "../application/usecases/CreateUser";
+import { UserRepositoryDrizzle } from "../resources/repositories/UserRepository";
 export const buildApp = () => {
   const app = fastify();
+
   app.setValidatorCompiler(validatorCompiler);
   app.setSerializerCompiler(serializerCompiler);
 
@@ -43,8 +46,8 @@ export const buildApp = () => {
         body: z.object({
           name: z.string().trim().min(1),
           age: z.number().int().min(18).max(100),
-          phoneNumber: z.string().trim().min(1),
-          email: z.string().email(),
+          phoneNumber: z.string().trim().startsWith("+55"),
+          email: z.email(),
           password: z.string().min(8),
           passwordConfirmation: z.string().min(8),
           preferredMarketingChannel: z.enum([
@@ -57,6 +60,16 @@ export const buildApp = () => {
         response: {
           201: z.object({
             id: z.uuid(),
+            name: z.string(),
+            age: z.number(),
+            phoneNumber: z.string(),
+            email: z.string(),
+            preferredMarketingChannel: z.enum([
+              "email",
+              "sms",
+              "push",
+              "whatsapp",
+            ]),
           }),
           400: z.object({
             error: z.string(),
@@ -71,39 +84,29 @@ export const buildApp = () => {
       },
       handler: async (req, res) => {
         try {
-          if (req.body.password !== req.body.passwordConfirmation) {
+          const createUser = new CreateUser(new UserRepositoryDrizzle());
+          const output = await createUser.execute(req.body);
+          return res.status(201).send(output);
+        } catch (error) {
+          if (error instanceof PasswordsDoNotMatchError) {
             return res.status(400).send({ error: "Passwords do not match" });
           }
-          const [existingUser] = await db
-            .select()
-            .from(userTable)
-            .where(eq(userTable.email, req.body.email));
-          if (existingUser) {
+
+          if (error instanceof EmailAlreadyRegisteredError) {
             return res.status(409).send({ error: "Email já cadastrado!" });
           }
-          const [user] = await db
-            .insert(userTable)
-            .values({
-              name: req.body.name,
-              age: req.body.age,
-              phoneNumber: req.body.phoneNumber,
-              email: req.body.email,
-              password: await bcrypt.hash(req.body.password, 10),
-              preferredMarketingChannel: req.body.preferredMarketingChannel,
-            })
-            .returning();
-          if (!user) {
-            return res.status(500).send({ error: "Erro ao criar o usuário!" });
+
+          if (error instanceof InvalidMarketingChannelError) {
+            return res
+              .status(400)
+              .send({ error: "Canal de marketing inválido!" });
           }
-          return res.status(201).send({
-            id: user.id,
-          });
-        } catch (error) {
-          console.error(error);
-          return res.status(500).send({ error: "Erro interno do servidor!" });
+
+          return res.status(500).send({ error: "Erro ao criar usuário!" });
         }
       },
     });
   });
+
   return app;
 };
