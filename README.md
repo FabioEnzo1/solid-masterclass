@@ -195,15 +195,6 @@ pnpm install
 
 ### Configurar variáveis de ambiente
 
-O projeto carrega variáveis de ambiente com `dotenv`. As variáveis identificadas são:
-
-```env
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres
-POSTGRES_DB=api_solid
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/api_solid"
-```
-
 ### Subir o banco com Docker Compose
 
 O arquivo `docker-compose.yml` define um serviço PostgreSQL na porta `5432`.
@@ -235,7 +226,7 @@ CREATE TABLE users (
 ### Iniciar a aplicação
 
 ```bash
-pnpm dev
+pnpm run dev
 ```
 
 Após iniciar, a API ficará disponível em:
@@ -269,7 +260,7 @@ Os testes cobrem:
 Para executar:
 
 ```bash
-pnpm test
+pnpm run test
 ```
 
 Observação: os testes acessam o banco configurado em `DATABASE_URL` e limpam a tabela `users` antes de cada caso de teste.
@@ -278,7 +269,6 @@ Observação: os testes acessam o banco configurado em `DATABASE_URL` e limpam a
 
 ### Melhorias técnicas
 
-- [ ] Corrigir o caminho do schema em `drizzle.config.ts`, que aponta para `./src/db/schema.ts`, enquanto o schema existente está em `./src/resources/db/schema.ts`.
 - [ ] Adicionar migrations versionadas para criação e evolução do banco de dados.
 - [ ] Adicionar scripts no `package.json` para gerar e aplicar migrations com Drizzle.
 - [ ] Adicionar script de lint no `package.json`.
