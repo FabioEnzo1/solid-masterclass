@@ -7,6 +7,7 @@ import {
   PasswordsDoNotMatchError,
   UserCreationError,
 } from "../errors";
+import { SendNotificationFactory } from "../factories";
 
 type MarketingChannel = "email" | "sms" | "push" | "whatsapp";
 
@@ -63,6 +64,11 @@ export class CreateUser {
     if (!user) {
       throw new UserCreationError();
     }
+
+    await SendNotificationFactory.create(
+      input.preferredMarketingChannel,
+    ).send();
+
     return {
       id: user.id,
       name: user.name,
