@@ -84,14 +84,6 @@ src/
 - `src/resources/notifications/`: estratégias de envio de notificação para `email`, `sms`, `push` e `whatsapp`.
 - `src/drivers/app.test.ts`: testes automatizados do endpoint `POST /users`.
 
-## Endpoints da API
-
-A API inicia na porta `4949`. A documentação Swagger UI fica disponível em:
-
-```text
-GET http://localhost:4949/docs
-```
-
 ### Tabela de endpoints
 
 | Método HTTP | Rota     | Descrição             | Parâmetros/corpo da requisição                                                                                          | Possíveis respostas                                                           |
