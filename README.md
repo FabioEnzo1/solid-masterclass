@@ -301,7 +301,5 @@ Observação: os testes acessam o banco configurado em `DATABASE_URL` e limpam a
 
 ## Autor
 
-Preencha com suas informações:
-
 - Nome: Fábio Enzo Araujo Barbosa
 - LinkedIn: www.linkedin.com/in/fábio-enzo-araujo-barbosa-71855235b
